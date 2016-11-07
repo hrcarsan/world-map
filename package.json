@@ -1,8 +1,8 @@
 {
   "name": "world-map",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "World map using d3",
-  "author": "Santiago H. Cardona", 
+  "author": "Santiago H. Cardona",
   "license": "MIT",
   "keywords": [
     "d3",
@@ -16,7 +16,7 @@
   "bugs": {
     "url": "https://github.com/santiagohecar/world-map/issues"
   },
-  "homepage": "https://github.com/santiagohecar/world-map#readme", 
+  "homepage": "https://github.com/santiagohecar/world-map#readme",
   "main": "src/world-map.js",
   "scripts": {
     "clean": "rimraf -- node_modules dist",
