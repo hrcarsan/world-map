@@ -1,3 +1,4 @@
+var WorldMap =
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -44,37 +45,38 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var WorldMap = __webpack_require__(1);
-
-	WorldMap("#schedules_map", 
-	{
-	  width:  800,
-	  height: 400,
-	  zoom:   true
-	});
-
-/***/ },
-/* 1 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var d3        = __webpack_require__(2);
-	var topojson  = __webpack_require__(3);
-	var worldjson = __webpack_require__(4);
+	var d3        = __webpack_require__(1);
+	var topojson  = __webpack_require__(2);
+	var worldjson = __webpack_require__(3);
 
 	/**
-	 * [WorldMap description]
-	 * @param  {[type]} parent  [description]
-	 * @param  object options   {
-	 *                            resolution : '110m' by default or '50m', // meter height above ground/surface
-	 *                          }
-	 *                           
-	 * @return {[type]}         [description]
+	 * Class that allow to create canvas views with draggable and zoomable world maps using the d3 library.
+	 * var WorldMap = require('./world-map');
+	 * 
+	 * @param  string parent  d3 selector e.g #my-map
+	 * @param  object options {
+	 *                          width: 960,
+	 *                          height: 480,
+	 *                          zoom: false,
+	 *                          resources: [],
+	 *                          onload: function (map) {}
+	 *                        }
+	 * @return dsa
 	 */
 	function WorldMap(parent, options) 
 	{
 	  if (!(this instanceof WorldMap))
 	  {
 	    return new WorldMap(parent, options);
+	  }
+
+	  var options_default =
+	  {
+	    width: 960,
+	    height: 480,
+	    resources: [],
+	    zoom: false,
+	    onload: null,
 	  }
 
 	  options = options || {};
@@ -95,19 +97,13 @@
 	  this.resources      = {};
 	  this.last_transform = {x: 0, y: 0, k: 1};
 
-	  /*this._resources.push(
-	  {
-	    name:   'world', 
-	    src:    options.resolution == '50m'? "res/world-50m.json": "res/world-110m.json", 
-	    onload: function(map) { map.load_land(); } 
-	  } );*/
-
 	  if (options.zoom) this.enable_zoom();
+
 	  this.load(options.onload);   
 	}
 
 
-	WorldMap.prototype.load = function(ready) 
+	WorldMap.prototype.load = function (ready) 
 	{
 	  var $this = this;
 	  var queue = d3.queue();
@@ -255,7 +251,7 @@
 	module.exports = WorldMap;
 
 /***/ },
-/* 2 */
+/* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
 	// https://d3js.org Version 4.3.0. Copyright 2016 Mike Bostock.
@@ -16644,7 +16640,7 @@
 
 
 /***/ },
-/* 3 */
+/* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(function (global, factory) {
@@ -17196,7 +17192,7 @@
 	})));
 
 /***/ },
-/* 4 */
+/* 3 */
 /***/ function(module, exports) {
 
 	module.exports = {

@@ -3,19 +3,33 @@ var topojson  = require("topojson");
 var worldjson = require("./world-110m.json");
 
 /**
- * [WorldMap description]
- * @param  {[type]} parent  [description]
- * @param  object options   {
- *                            resolution : '110m' by default or '50m', // meter height above ground/surface
- *                          }
- *                           
- * @return {[type]}         [description]
+ * Class that allow to create canvas views with draggable and zoomable world maps using the d3 library.
+ * var WorldMap = require('./world-map');
+ * 
+ * @param  string parent  d3 selector e.g #my-map
+ * @param  object options {
+ *                          width: 960,
+ *                          height: 480,
+ *                          zoom: false,
+ *                          resources: [],
+ *                          onload: function (map) {}
+ *                        }
+ * @return dsa
  */
 function WorldMap(parent, options) 
 {
   if (!(this instanceof WorldMap))
   {
     return new WorldMap(parent, options);
+  }
+
+  var options_default =
+  {
+    width: 960,
+    height: 480,
+    resources: [],
+    zoom: false,
+    onload: null,
   }
 
   options = options || {};
@@ -36,19 +50,13 @@ function WorldMap(parent, options)
   this.resources      = {};
   this.last_transform = {x: 0, y: 0, k: 1};
 
-  /*this._resources.push(
-  {
-    name:   'world', 
-    src:    options.resolution == '50m'? "res/world-50m.json": "res/world-110m.json", 
-    onload: function(map) { map.load_land(); } 
-  } );*/
-
   if (options.zoom) this.enable_zoom();
+
   this.load(options.onload);   
 }
 
 
-WorldMap.prototype.load = function(ready) 
+WorldMap.prototype.load = function (ready) 
 {
   var $this = this;
   var queue = d3.queue();

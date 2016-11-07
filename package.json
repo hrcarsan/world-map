@@ -2,23 +2,36 @@
   "name": "world-map",
   "version": "0.0.1",
   "description": "World map using d3",
+  "author": "Santiago H. Cardona", 
+  "license": "MIT",
   "keywords": [
     "d3",
     "world",
     "map"
   ],
-  "author": "Santiago H. Cardona",
-  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/santiagohecar/world-map.git"
+  },
+  "bugs": {
+    "url": "https://github.com/santiagohecar/world-map/issues"
+  },
+  "homepage": "https://github.com/santiagohecar/world-map#readme", 
   "main": "src/world-map.js",
   "scripts": {
-    "bundle": "webpack"
-  },  
+    "clean": "rimraf -- node_modules dist",
+    "clean:dist": "rimraf -- dist",
+    "build": "webpack",
+    "build:prod": "webpack",
+    "dist": "npm run clean:dist && npm run build && npm run build:prod"
+  },
   "dependencies": {
     "d3": "^4.3.0",
     "topojson": "^1.6.27"
   },
   "devDependencies": {
     "json-loader": "^0.5.4",
+    "rimraf": "^2.5.4",
     "webpack": "^1.13.3"
   }
 }
