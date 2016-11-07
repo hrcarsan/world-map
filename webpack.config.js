@@ -1,7 +1,7 @@
 const webpack = require("webpack");
 const EVENT   = process.env.npm_lifecycle_event;
 const PROD    = EVENT.includes('prod');
-const config  = {}; 
+const config  = {};
 
 config.entry = './src/world-map.js'
 
