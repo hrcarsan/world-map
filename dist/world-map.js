@@ -53,65 +53,84 @@ var WorldMap =
 	 * Class that allow to create canvas views with draggable and zoomable world maps using the d3 library.
 	 * var WorldMap = require('./world-map');
 	 * 
-	 * @param  string parent  d3 selector e.g #my-map
-	 * @param  object options {
-	 *                          width: 960,
-	 *                          height: 480,
-	 *                          zoom: false,
-	 *                          resources: [],
-	 *                          onload: function (map) {}
-	 *                        }
-	 * @return dsa
+	 * @param  string containerId   id of the container element 
+	 * @param  object options       some util options, defaults: 
+	 * {
+	 *   width: 960,
+	 *   height: 480,
+	 *   zoom: false,
+	 *   resources: 
+	 *   [
+	 *     { 
+	 *       name: 'a',
+	 *       type: 'json',                        // also could be 'csv' 
+	 *       src: 'example.com/a.json',
+	 *       onload: function (map, resource) {}, // called after load the resource
+	 *       row: myOtherFunction,                // called for all row of the resource  
+	 *     }
+	 *   ], 
+	 *   onload: function (map) {},
+	 *   hideAntarctic: true,
+	 *   landsColor: '#ddd',
+	 *   landsBorder: '#fff'
+	 * }
 	 */
-	function WorldMap(parent, options) 
+	function WorldMap(containerId, options) 
 	{
 	  if (!(this instanceof WorldMap))
 	  {
-	    return new WorldMap(parent, options);
+	    return new WorldMap(containerId, options);
 	  }
 
-	  var options_default =
+	  this.setOptions(options);
+
+	  this.container        = d3.select("#"+containerId);
+	  this.width            = this.options.width;
+	  this.height           = this.options.height;
+	  this.initialScale     = this.height/Math.PI;
+	  this.initialTranslate = [this.width/2, this.height/2];
+	  this.projection       = d3.geoEquirectangular().scale(this.initialScale).translate(this.initialTranslate);
+	  this.canvas           = this.container.append("canvas").attr("width", this.width).attr("height", this.height);
+	  this.context          = this.canvas.node().getContext("2d");
+	  this.path             = d3.geoPath().projection(this.projection).context(this.context);
+	  this.resources        = {};
+
+	  if (this.options.zoom) this.enableZoom();
+
+	  this.load();   
+	}
+
+
+	WorldMap.prototype.setOptions = function (options)
+	{
+	  options = options || {};
+
+	  this.options =
 	  {
 	    width: 960,
 	    height: 480,
 	    resources: [],
 	    zoom: false,
 	    onload: null,
-	  }
+	    hideAntarctic: true,
+	    landsColor: '#ddd',
+	    landsBorder: '#fff'
+	  }  
 
-	  options = options || {};
-
-	  this.parent        = d3.select(parent);
-	  this.width         = options.width  || 960;
-	  this.height        = options.height || 480;
-	  this.projection    = d3.geoEquirectangular().scale(this.height/Math.PI).translate([this.width/2, this.height/2]);
-
-	  this.canvas         = this.parent.append("canvas").attr("width", this.width).attr("height", this.height);
-	  this.context        = this.canvas.node().getContext("2d");
-
-	  this.path           = d3.geoPath().projection(this.projection).context(this.context);
-	  this.container      = this.canvas;
-	  // this.container      = this.parent.append("svg").attr("width", this.width).attr("height", this.height).attr('class', 'd3-map');
-	  // this.svg            = this.container.append("g");
-	  this._resources     = options.resources || [];
-	  this.resources      = {};
-	  this.last_transform = {x: 0, y: 0, k: 1};
-
-	  if (options.zoom) this.enable_zoom();
-
-	  this.load(options.onload);   
+	  for (key in options) this.options[key] = options[key];
 	}
 
 
-	WorldMap.prototype.load = function (ready) 
+	WorldMap.prototype.load = function () 
 	{
-	  var $this = this;
-	  var queue = d3.queue();
+	  var $this  = this;
+	  var queue  = d3.queue();
+	  var onload = this.options.load;
 
-	  this.resources.world = worldjson;
-	  this.load_land();
+	  this.loadLand();
 
-	  this._resources.forEach(function (resource)
+	  // load user resources
+	  this.options.resources.forEach(function (resource)
 	  {    
 	    queue.defer(function (callback) 
 	    {
@@ -130,20 +149,24 @@ var WorldMap =
 	    }); 
 	  });
 
-	  if (ready) queue.await(function () { ready($this); });
+	  if (onload) queue.await(function () { onload($this); });
 	}
 
 
-	WorldMap.prototype.load_land = function() 
+	WorldMap.prototype.loadLand = function() 
 	{
-	  var world     = this.resources.world;
+	  var world     = worldjson;
 	  var countries = world.objects.countries;
 
-	  // remove antartic
-	  countries.geometries =  countries.geometries.filter(function(d) { return d.id != 10; });
+	  // hide antartic
+	  if (this.options.hideAntarctic)
+	  {
+	    countries.geometries = countries.geometries.filter(function(d) { return d.id != 10; });  
+	  }  
 
-	  this.lands    = topojson.merge(world, countries.geometries);
-	  this.boundary = topojson.mesh(world,  countries, function (a, b) { return a !== b; });
+	  this.resources.world = world;
+	  this.lands           = topojson.merge(world, countries.geometries);
+	  this.boundary        = topojson.mesh(world,  countries, function (a, b) { return a !== b; });
 
 	  this.draw();
 	}
@@ -151,100 +174,73 @@ var WorldMap =
 
 	WorldMap.prototype.draw = function()
 	{
+	  this.context.save();
 	  this.context.clearRect(0, 0, this.width, this.height);
+
+	  // apply zoom transformation
+	  if (d3.event && d3.event.transform)
+	  {
+	    var x      = d3.event.transform.x;
+	    var y      = d3.event.transform.y;
+	    var k      = d3.event.transform.k;
+	    var lambda = 360/this.width*1/k*x;
+
+	    this.context.save();
+	    this.context.clearRect(0, 0, this.width, this.height);
+
+	    this.context.translate(0, y);
+	    this.projection.rotate([lambda, 0, 0]);
+	    this.context.scale(k, k);
+
+	    this.context.lineWidth = 1/k;
+	  }
 	  
 	  // draw lands
 	  this.context.beginPath();
 	  this.path(this.lands);
-	  this.context.fillStyle = '#ddd';
+	  this.context.fillStyle = this.options.landsColor;
 	  this.context.fill();
 
+	  // draw boundaries
 	  this.context.beginPath();
 	  this.path(this.boundary);
-	  this.context.strokeStyle = '#fff';
-	  this.context.stroke(); 
+	  this.context.strokeStyle = this.options.landsBorder;
+	  this.context.stroke();
+	  this.context.restore(); 
 	}
 
 
 	WorldMap.prototype.on = function() 
 	{
-	  this.container.on.apply(this.canvas, arguments);
+	  this.canvas.on.apply(this.canvas, arguments);
 	}
 
-	/*--------------------------- zoom ---------------------------*/
 
-	WorldMap.prototype.enable_zoom = function() 
+	WorldMap.prototype.enableZoom = function() 
 	{
 	  var $this = this;
-	  // this.zoom.translateExtent([[-Infinity, v1[1]], [Infinity, v2[1]]]);
 
-	  this.zoom = d3.zoom().scaleExtent([1, 20]);//.translateExtent([[-Infinity, v1[1]], [Infinity, v2[1]]]);
-	  this.zoom.on("zoom", function () { $this.zoomed(); });
-	  this.container.call(this.zoom);
-	}
-
-	function mercatorBounds(projection) 
-	{
-	  var yaw   = projection.rotate()[0];
-	  var xymax = projection([-yaw+180-1e-6,-90]);
-	  var xymin = projection([-yaw-180+1e-6, 90]);
-	  
-	  return [xymin, xymax];
+	  this.zoom = d3.zoom().scaleExtent([1, 20]).translateExtent([[-Infinity, 0], [Infinity, this.height]]);
+	  this.zoom.on("zoom", function () { $this.draw(); });
+	  this.canvas.call(this.zoom);
 	}
 
 
-	WorldMap.prototype.zoomed = function() 
+	WorldMap.prototype.resetZoom = function() 
 	{
-	  var transform = d3.event.transform;
-	  var dx        = transform.x - this.last_transform.x;
-	  var dy        = transform.y - this.last_transform.y;
-	  var tp        = this.projection.translate();
-	  var ts        = this.projection.scale();
-
-	  var b = mercatorBounds(this.projection);
-
-	    //      if (b[0][1] + dy > 0)           dy = -b[0][1];
-	    // else if (b[1][1] + dy < this.height) dy = this.height-b[1][1];
-
-	  this.projection.translate([tp[0], tp[1] +dy]);
-
-	  if (transform.k != this.last_transform.k) 
-	  {
-	    this.projection.scale(this.height/Math.PI*transform.k);
-
-	    // var v1 = this.projection([-180, 90]);
-	    // var v2 = this.projection([180, -90]);
-
-	    // this.zoom.translateExtent([[-Infinity, v1[1]], [Infinity, v2[1]]]);
-	  }
-	  else
-	  {
-	    var yaw = this.projection.rotate()[0];
-	    this.projection.rotate([yaw+ (360*dx/this.width)*1/transform.k, 0, 0]);
-	  }    
-
-	  this.last_transform = transform;
-	  this.draw(); 
-
-	  this.container.dispatch('zoom', {detail: {x: transform.x, y: transform.y , k: transform.k}});
+	  this.canvas.call(this.zoom.transform, d3.zoomIdentity);
 	}
 
 
-	WorldMap.prototype.reset_zoom = function() 
+	WorldMap.prototype.zoomIn = function(k) 
 	{
-	  this.container.call(this.zoom.transform, d3.zoomIdentity);
+	  this.canvas.call(this.zoom.scaleBy, k || 1.5);
 	}
 
 
-	WorldMap.prototype.zoom_in = function(k) 
+	WorldMap.prototype.zoomOut = function(k) 
 	{
-	  this.container.call(this.zoom.scaleBy, k || 1.5);
-	}
-
-
-	WorldMap.prototype.zoom_out = function(k) 
-	{
-	  this.container.call(this.zoom.scaleBy, k || 1/1.5);
+	  this.canvas.call(this.zoom.scaleBy, k || 1/1.5);
 	}
 
 
