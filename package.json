@@ -1,6 +1,6 @@
 {
   "name": "world-map",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "World map using d3",
   "author": "Santiago H. Cardona",
   "license": "MIT",
