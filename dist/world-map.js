@@ -65,11 +65,11 @@ var WorldMap =
 	 *       name: 'a',
 	 *       type: 'json',                        // also could be 'csv' 
 	 *       src: 'example.com/a.json',
-	 *       onload: function (map, resource) {}, // called after load the resource
+	 *       onLoad: function (map, resource) {}, // called after load the resource
 	 *       row: myOtherFunction,                // called for all row of the resource  
 	 *     }
 	 *   ], 
-	 *   onload: function (map) {},
+	 *   onLoad: function (map) {},
 	 *   hideAntarctic: true,
 	 *   landsColor: '#ddd',
 	 *   landsBorder: '#fff'
@@ -94,28 +94,30 @@ var WorldMap =
 	  this.context          = this.canvas.node().getContext("2d");
 	  this.path             = d3.geoPath().projection(this.projection).context(this.context);
 	  this.resources        = {};
+	  this.transform        = { x: 0, y: 0, k:1 };
 
 	  if (this.options.zoom) this.enableZoom();
 
 	  this.load();   
 	}
 
+	WorldMap.prototype.options =
+	{
+	  width: 960,
+	  height: 480,
+	  resources: [],
+	  zoom: false,
+	  onLoad: function (map) {},
+	  hideAntarctic: true,
+	  landsColor: '#ddd',
+	  landsBorder: '#fff',
+	  onDraw: function (map) {}
+	}  
+
 
 	WorldMap.prototype.setOptions = function (options)
 	{
-	  options = options || {};
-
-	  this.options =
-	  {
-	    width: 960,
-	    height: 480,
-	    resources: [],
-	    zoom: false,
-	    onload: null,
-	    hideAntarctic: true,
-	    landsColor: '#ddd',
-	    landsBorder: '#fff'
-	  }  
+	  options = options || {}; 
 
 	  for (key in options) this.options[key] = options[key];
 	}
@@ -125,7 +127,6 @@ var WorldMap =
 	{
 	  var $this  = this;
 	  var queue  = d3.queue();
-	  var onload = this.options.load;
 
 	  this.loadLand();
 
@@ -137,7 +138,7 @@ var WorldMap =
 	      var onload = function (d)
 	      {
 	        $this.resources[resource.name] = d;        
-	        if (resource.onload) resource.onload($this, d);
+	        if (resource.onLoad) resource.onLoad($this, d);
 	        callback();
 	      };
 
@@ -149,11 +150,11 @@ var WorldMap =
 	    }); 
 	  });
 
-	  if (onload) queue.await(function () { onload($this); });
+	  queue.await(function () { $this.options.onLoad($this); });
 	}
 
 
-	WorldMap.prototype.loadLand = function() 
+	WorldMap.prototype.loadLand = function () 
 	{
 	  var world     = worldjson;
 	  var countries = world.objects.countries;
@@ -172,28 +173,21 @@ var WorldMap =
 	}
 
 
-	WorldMap.prototype.draw = function()
+	WorldMap.prototype.draw = function ()
 	{
 	  this.context.save();
 	  this.context.clearRect(0, 0, this.width, this.height);
 
 	  // apply zoom transformation
-	  if (d3.event && d3.event.transform)
-	  {
-	    var x      = d3.event.transform.x;
-	    var y      = d3.event.transform.y;
-	    var k      = d3.event.transform.k;
-	    var lambda = 360/this.width*1/k*x;
+	  var x      = this.transform.x;
+	  var y      = this.transform.y;
+	  var k      = this.transform.k;
+	  var lambda = 360/this.width*1/k*x;
 
-	    this.context.save();
-	    this.context.clearRect(0, 0, this.width, this.height);
-
-	    this.context.translate(0, y);
-	    this.projection.rotate([lambda, 0, 0]);
-	    this.context.scale(k, k);
-
-	    this.context.lineWidth = 1/k;
-	  }
+	  this.context.translate(0, y);
+	  this.projection.rotate([lambda, 0, 0]);
+	  this.context.scale(k, k);
+	  this.context.lineWidth = 1/k;
 	  
 	  // draw lands
 	  this.context.beginPath();
@@ -206,39 +200,48 @@ var WorldMap =
 	  this.path(this.boundary);
 	  this.context.strokeStyle = this.options.landsBorder;
 	  this.context.stroke();
+
+	  this.options.onDraw(this);
 	  this.context.restore(); 
 	}
 
 
-	WorldMap.prototype.on = function() 
+	WorldMap.prototype.on = function () 
 	{
 	  this.canvas.on.apply(this.canvas, arguments);
 	}
 
 
-	WorldMap.prototype.enableZoom = function() 
+	WorldMap.prototype.enableZoom = function () 
 	{
 	  var $this = this;
 
 	  this.zoom = d3.zoom().scaleExtent([1, 20]).translateExtent([[-Infinity, 0], [Infinity, this.height]]);
-	  this.zoom.on("zoom", function () { $this.draw(); });
+	  this.zoom.on("zoom", function () { $this.setTransform(d3.event.transform); });
 	  this.canvas.call(this.zoom);
 	}
 
 
-	WorldMap.prototype.resetZoom = function() 
+	WorldMap.prototype.setTransform = function (transform)
+	{
+	  this.transform = transform;
+	  this.draw();
+	}
+
+
+	WorldMap.prototype.resetZoom = function () 
 	{
 	  this.canvas.call(this.zoom.transform, d3.zoomIdentity);
 	}
 
 
-	WorldMap.prototype.zoomIn = function(k) 
+	WorldMap.prototype.zoomIn = function (k) 
 	{
 	  this.canvas.call(this.zoom.scaleBy, k || 1.5);
 	}
 
 
-	WorldMap.prototype.zoomOut = function(k) 
+	WorldMap.prototype.zoomOut = function (k) 
 	{
 	  this.canvas.call(this.zoom.scaleBy, k || 1/1.5);
 	}
