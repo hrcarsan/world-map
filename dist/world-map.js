@@ -51,7 +51,6 @@ var WorldMap =
 
 	/**
 	 * Class that allow to create canvas views with draggable and zoomable world maps using the d3 library.
-	 * var WorldMap = require('./world-map');
 	 * 
 	 * @param  string containerId   id of the container element 
 	 * @param  object options       some util options, defaults: 
@@ -100,6 +99,7 @@ var WorldMap =
 
 	  this.load();   
 	}
+
 
 	WorldMap.prototype.options =
 	{
@@ -182,7 +182,7 @@ var WorldMap =
 	  var x      = this.transform.x;
 	  var y      = this.transform.y;
 	  var k      = this.transform.k;
-	  var lambda = 360/this.width*1/k*x;
+	  var lambda = 360/(this.height*2)*x*(1/k);
 
 	  this.context.translate(0, y);
 	  this.projection.rotate([lambda, 0, 0]);
