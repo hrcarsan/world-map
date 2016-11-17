@@ -29,7 +29,7 @@ Add a container where map can be loaded
 Pass the id as first param of the constructor   
 
 ```javascript
-var myMap = new WorldMap("my-map");
+var map = new WorldMap("my-map");
 ```
 
 A optional second param is a object with the map options 
@@ -37,10 +37,24 @@ A optional second param is a object with the map options
 ```javascript
 WorldMap("my-map", 
 {
-  width: 800,
-  height: 400,
-  landsColor: '#008282',
-  zoom: true
+  width: 960,
+  height: 480,
+  zoom: false,                             // enable/disable dragging and zooming
+  resources:                               // load additional resources to customize the maps 
+  [
+    { 
+      name: 'stations',                    // when loaded can access as map.resources.stations
+      type: 'json',                        // also could be 'csv' 
+      src: 'example.com/a.json',           // path to the resource
+      onLoad: function (map, resource) {}, // called after the resource is loaded
+      row: myOtherFunction,                // called for all row of the resource, used whit csv  
+    }
+  ], 
+  onLoad: function (map) {},               // called when all resources loading is complete
+  hideAntarctic: true,                       
+  landsColor: '#ddd',
+  landsBorder: '#fff',
+  onDraw: function (map) {}                // draw additional shapes inside
 });
 ```
 
