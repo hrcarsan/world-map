@@ -6,13 +6,13 @@ Create and add world maps to your pages, enable zoom to get a more interactive v
 
 ## Usage
 
-Download the [latest release](https://github.com/santiagohecar/world-map/releases/latest), copy `world-map.js` or `world-map.min.js` (for minified version) from the dist folder into your project and simply load the file in a script tag:
+Download the [latest release](https://github.com/santiagohecar/world-map/releases/latest), copy `world-map.js` or `world-map.min.js` (for minified version) from the dist folder into your project and simply load the file in a script tag
 
 ```html
 <script type="text/javascript" src="worl-map.min.js"></script>
 ```
 
-You can also install with npm: 
+You can also install with npm
     
     npm install world-map --save
 
