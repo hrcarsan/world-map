@@ -20,3 +20,7 @@ Then require it in your code
     
 
 Take a look to a [live example](http://plnkr.co/edit/sOvkiTxQMgwtRFERq4qr?p=preview).
+
+## License
+Copyright &copy; 2016 [Santiago H. Cardona](https://github.com/santherrerac).
+Licensed under the [MIT License](LICENSE).
