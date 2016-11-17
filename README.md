@@ -6,7 +6,7 @@ Create and add world maps to your pages, enable zoom to get a more interactive v
 
 ## Usage
 
-Clone the repo or download `world-map.js` or world-map.min.js for minified version from the dist folder and simply load the file in a script tag
+Clone the repo or download `world-map.js` or `world-map.min.js` for minified version from the dist folder and simply load the file in a script tag
 
     <script type="text/javascript" src="worl-map.min.js"></script>
 
