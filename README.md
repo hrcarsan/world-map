@@ -58,7 +58,7 @@ WorldMap("my-map",
 });
 ```
 
-Take a look to a [live example](http://plnkr.co/edit/sOvkiTxQMgwtRFERq4qr?p=preview).
+Take a look to a <a href="http://plnkr.co/edit/sOvkiTxQMgwtRFERq4qr?p=preview" target="_blank">live example</a>.
 
 ## License
 Copyright &copy; 2016 [Santiago H. Cardona](https://github.com/santiagohecar).
