@@ -21,18 +21,18 @@ Then require it in your code
 ```javascript
 var WorldMap = require("world-map");
 ```    
-Add a container where map can be loaded
+To create a new map, first add the container where can be loaded
 
 ```html
 <div id="my-map"></div>
 ```
-Pass the id as first param of the constructor   
+Pass the id as first parameter of the constructor, and that's all!  
 
 ```javascript
 var map = new WorldMap("my-map");
 ```
 
-A optional second param is a object with the map options 
+A optional object of options can be passed as second parameter
 
 ```javascript
 WorldMap("my-map", 
@@ -54,7 +54,7 @@ WorldMap("my-map",
   hideAntarctic: true,                       
   landsColor: '#ddd',
   landsBorder: '#fff',
-  onDraw: function (map) {}                // draw additional shapes inside
+  onDraw: function (map) {}                // draw additional canvas shapes inside
 });
 ```
 
