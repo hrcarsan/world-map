@@ -4,6 +4,8 @@ Create and add world maps to your pages, enable zoom to get a more interactive v
 
 ![alt tag](https://raw.githubusercontent.com/santiagohecar/world-map/master/example/world-map.png)
 
+See on [bl.ocks.org](http://bl.ocks.org/santiagohecar/ddd1470b88e1e57d2ec1f7273185f018).
+
 ## Usage
 
 Download the [latest release](https://github.com/santiagohecar/world-map/releases/latest), copy `world-map.js` or `world-map.min.js` (for minified version) from the dist folder into your project and simply load the file in a script tag
