@@ -62,6 +62,8 @@ WorldMap("my-map",
 
 Take a look to a [live example](http://plnkr.co/edit/sOvkiTxQMgwtRFERq4qr?p=preview).
 
+For a more advanced example see [flights-map](https://github.com/santiagohecar/flights-map).
+
 ## License
 Copyright &copy; 2016 [Santiago H. Cardona](https://github.com/santiagohecar).
 Licensed under the [MIT License](LICENSE).
