@@ -65,5 +65,5 @@ Take a look to a [live example](http://plnkr.co/edit/sOvkiTxQMgwtRFERq4qr?p=prev
 For a more advanced example [flights-map](https://github.com/santiagohecar/flights-map) can be useful, see working [here](http://bl.ocks.org/santiagohecar/2f8be5c36ac9a08168b10b5a10a916e4).
 
 ## License
-Copyright &copy; 2016 [Santiago H. Cardona](https://github.com/santiagohecar).
+Copyright &copy; 2017 [Santiago H. Cardona](https://github.com/santiagohecar).
 Licensed under the [MIT License](LICENSE).
