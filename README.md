@@ -2,13 +2,13 @@
 
 Create and add world maps to your pages, enable zoom to get a more interactive views of the lands, and load additional resources to draw and customize the maps.
 
-![alt tag](https://raw.githubusercontent.com/gohcar/world-map/master/example/world-map.png)
+![alt tag](https://raw.githubusercontent.com/santiagohecar/world-map/master/example/world-map.png)
 
-See on [bl.ocks.org](http://bl.ocks.org/gohcar/ddd1470b88e1e57d2ec1f7273185f018).
+See on [bl.ocks.org](http://bl.ocks.org/santiagohecar/ddd1470b88e1e57d2ec1f7273185f018).
 
 ## Usage
 
-Download the [latest release](https://github.com/gohcar/world-map/releases/latest), copy `world-map.js` or `world-map.min.js` (for minified version) from the dist folder into your project and simply load the file in a script tag
+Download the [latest release](https://github.com/santiagohecar/world-map/releases/latest), copy `world-map.js` or `world-map.min.js` (for minified version) from the dist folder into your project and simply load the file in a script tag
 
 ```html
 <script type="text/javascript" src="worl-map.min.js"></script>
@@ -62,8 +62,8 @@ WorldMap("my-map",
 
 Take a look to a [live example](http://plnkr.co/edit/sOvkiTxQMgwtRFERq4qr?p=preview).
 
-For a more advanced example [flights-map](https://github.com/gohcar/flights-map) can be useful, see working [here](http://bl.ocks.org/gohcar/2f8be5c36ac9a08168b10b5a10a916e4).
+For a more advanced example [flights-map](https://github.com/santiagohecar/flights-map) can be useful, see working [here](http://bl.ocks.org/santiagohecar/2f8be5c36ac9a08168b10b5a10a916e4).
 
 ## License
-Copyright &copy; 2016 [Santiago H. Cardona](https://github.com/gohcar).
+Copyright &copy; 2016 [Santiago H. Cardona](https://github.com/santiagohecar).
 Licensed under the [MIT License](LICENSE).
